@@ -14,5 +14,5 @@ main(int argc, char *argv[])
    printf(1, "%s%s", "Freeing memory ", "\n");
    printf(1, "%s%d%s", "The process is using: ", memsize(), "\n");
 
-  exit();
+  exit(0);
 }

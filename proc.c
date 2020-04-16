@@ -223,9 +223,9 @@ fork(void)
 
 // Exit the current process.  Does not return.
 // An exited process remains in the zombie state
-// until its parent calls wait() to find out it exited.
+// until its parent calls wait(null) to find out it exited.
 void
-exit(void)
+exit(int status)
 {
   struct proc *curproc = myproc();
   struct proc *p;
@@ -233,6 +233,9 @@ exit(void)
 
   if(curproc == initproc)
     panic("init exiting");
+
+  //update exit status
+  curproc->status = status;
 
   // Close all open files.
   for(fd = 0; fd < NOFILE; fd++){
@@ -249,7 +252,7 @@ exit(void)
 
   acquire(&ptable.lock);
 
-  // Parent might be sleeping in wait().
+  // Parent might be sleeping in wait(null).
   wakeup1(curproc->parent);
 
   // Pass abandoned children to init.
@@ -270,7 +273,7 @@ exit(void)
 // Wait for a child process to exit and return its pid.
 // Return -1 if this process has no children.
 int
-wait(void)
+wait(int* status)
 {
   struct proc *p;
   int havekids, pid;
@@ -287,6 +290,8 @@ wait(void)
       if(p->state == ZOMBIE){
         // Found one.
         pid = p->pid;
+        if(status != null)
+          *status = p->status; //update exit status of terminated child
         kfree(p->kstack);
         p->kstack = 0;
         freevm(p->pgdir);
@@ -294,6 +299,7 @@ wait(void)
         p->parent = 0;
         p->name[0] = 0;
         p->killed = 0;
+        p->status = 0;    //reset status of terminated process (child)
         p->state = UNUSED;
         release(&ptable.lock);
         return pid;
