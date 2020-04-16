@@ -96,3 +96,14 @@ sys_memsize(void)
 {
   return myproc()->sz;
 }
+
+//@TODO: check what value to send
+int
+sys_policy(void)
+{
+  int poly;
+
+  if(argint(0, &poly) < 0)
+    return -1;
+  return policy(poly);
+}

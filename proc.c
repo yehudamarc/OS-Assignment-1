@@ -331,6 +331,10 @@ scheduler(void)
   struct proc *p;
   struct cpu *c = mycpu();
   c->proc = 0;
+
+  //@TODO check if it is the right place to initialize
+  //initializing scheduler policy to default
+  sched_type = 0;
   
   for(;;){
     // Enable interrupts on this processor.
@@ -537,4 +541,17 @@ procdump(void)
     }
     cprintf("\n");
   }
+}
+
+int
+policy(int pol)
+{
+  // if value is legal - change scheduler policy
+  if( 0 <= pol && pol <= 2){
+    sched_type = pol;
+    return 0;
+  }
+
+  //if illegal value
+  return -1;
 }
