@@ -555,3 +555,14 @@ policy(int pol)
   //if illegal value
   return -1;
 }
+
+int
+set_ps_priority(int priority)
+{
+  if( 1 <= priority && priority <= 10){
+    myproc()->ps_priority = priority;
+    return 0;
+  }
+  return -1; 
+  
+}

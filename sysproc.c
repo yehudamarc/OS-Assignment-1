@@ -107,3 +107,13 @@ sys_policy(void)
     return -1;
   return policy(poly);
 }
+
+int
+sys_set_ps_priority(void)
+{
+  int prio;
+
+  if(argint(0, &prio) < 0)
+    return -1;
+  return set_ps_priority(prio);
+}
