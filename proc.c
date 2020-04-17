@@ -88,6 +88,8 @@ allocproc(void)
 found:
   p->state = EMBRYO;
   p->pid = nextpid++;
+  //initilize ps_priority to 5
+  p->ps_priority = 5;
 
   release(&ptable.lock);
 
@@ -556,6 +558,7 @@ policy(int pol)
   return -1;
 }
 
+//set the priority is ps policy
 int
 set_ps_priority(int priority)
 {
