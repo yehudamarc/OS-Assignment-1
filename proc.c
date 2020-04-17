@@ -544,8 +544,8 @@ procdump(void)
 }
 
 int
-policy(int pol)
-{
+policy(int pol) 
+  {
   // if value is legal - change scheduler policy
   if( 0 <= pol && pol <= 2){
     sched_type = pol;
