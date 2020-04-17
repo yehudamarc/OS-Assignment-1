@@ -51,6 +51,7 @@ struct proc {
   char name[16];               // Process name (debugging)
   int status;                  // status of exit and wait
   int ps_priority;             // Process priority in Priority Scheduling policy (limited 1-10)
+  long long accumulator        // Accumulator field for Priority Scheduling policy
 };
 
 // Process memory is laid out contiguously, low addresses first:
