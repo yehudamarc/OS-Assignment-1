@@ -19,6 +19,7 @@ extern void forkret(void);
 extern void trapret(void);
 
 static void wakeup1(void *chan);
+static void resetAccumultor(struct proc *curr_proc);
 
 void
 pinit(void)
@@ -601,3 +602,20 @@ for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
   curr_proc->accumulator = accumulator;
 
 }
+
+// Gather current process statistics into given structure
+int 
+proc_info(struct perf * performance)
+{
+  if(performance == null)
+    return -1;
+
+  performance->ps_priority = myproc()->ps_priority;
+  performance->rtime = myproc()->accumulator;
+
+  return 0;
+}
+
+
+
+

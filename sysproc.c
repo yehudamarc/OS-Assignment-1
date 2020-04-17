@@ -117,3 +117,17 @@ sys_set_ps_priority(void)
     return -1;
   return set_ps_priority(prio);
 }
+
+
+int
+sys_proc_info(void)
+{
+  struct perf* perf;
+
+  if(argptr(0, ((void*)&perf),sizeof(*perf)) < 0)
+      return -1;
+  return proc_info(perf);
+  //@TODO: how to put information into perf struct?
+
+}
+
