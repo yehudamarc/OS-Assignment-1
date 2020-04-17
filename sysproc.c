@@ -94,7 +94,7 @@ sys_uptime(void)
 int
 sys_memsize(void)
 {
-  return myproc()->sz;
+  return myproc()->ps_priority;
 }
 
 //@TODO: check what value to send
