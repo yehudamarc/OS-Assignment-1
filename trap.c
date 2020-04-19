@@ -51,6 +51,8 @@ trap(struct trapframe *tf)
     if(cpuid() == 0){
       acquire(&tickslock);
       ticks++;
+      // Update process fields that depends on ticks
+      updateStats();
       wakeup(&ticks);
       release(&tickslock);
     }

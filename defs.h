@@ -124,6 +124,7 @@ int 			policy(int);
 int 			set_ps_priority(int);
 int 			proc_info(struct perf * perf);
 int 			set_cfs_priority(int);
+void 			updateStats(void);
 
 // swtch.S
 void            swtch(struct context**, struct context*);

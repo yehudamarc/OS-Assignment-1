@@ -615,7 +615,9 @@ resetAccumultor(struct proc *curr_proc)
   struct proc *p;
   int accumulator = 0;
 
-for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+  //@TODO: check if and how to acquire lock
+  // acquire(&ptable.lock);
+  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
     if(p->pid !=curr_proc->pid && (p->state == RUNNABLE || p->state == RUNNING)){
       accumulator = p->accumulator;
       break;
@@ -627,6 +629,7 @@ for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
       if(p->accumulator < accumulator)
         accumulator = p->accumulator;
   }
+  // release(&ptable.lock);
 
   curr_proc->accumulator = accumulator;
 
@@ -650,6 +653,24 @@ proc_info(struct perf * performance)
   return 0;
 }
 
+void
+updateStats(void)
+{
+  struct proc *p;
 
+  acquire(&ptable.lock);
 
+  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+    if(p->state == RUNNING){
+      p->rtime++;
+    }
+    if(p->state == RUNNABLE){
+      p->stime++;
+    }
+    if(p->state == SLEEPING){
+      p->retime++;
+    }
+  }
 
+  release(&ptable.lock);
+}
