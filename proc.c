@@ -741,10 +741,7 @@ proc_info(struct perf * performance)
   if(performance == null)
     return -1;
 
-  performance->pid = myproc()->pid;
   performance->ps_priority = myproc()->ps_priority;
-  performance->accumulator = myproc()->accumulator;
-  performance->cfs_priority = myproc()->decay_factor;
   performance->rtime = myproc()->rtime;
   performance->stime = myproc()->stime;
   performance->retime = myproc()->retime;
