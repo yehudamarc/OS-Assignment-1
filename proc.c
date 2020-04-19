@@ -340,6 +340,7 @@ void
 scheduler(void)
 {
   struct proc *p;
+  struct proc *p2;
   struct cpu *c = mycpu();
   c->proc = 0;
 
@@ -351,30 +352,128 @@ scheduler(void)
     // Enable interrupts on this processor.
     sti();
 
+    //reset temporary variable p2
+    p2 = null;
+
     // Loop over process table looking for process to run.
     acquire(&ptable.lock);
-    for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
-      if(p->state != RUNNABLE)
-        continue;
+    // Default Scheduling policy
+    if(sched_type == 0){
+      for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+        if(p->state != RUNNABLE)
+          continue;
 
-      // Switch to chosen process.  It is the process's job
-      // to release ptable.lock and then reacquire it
-      // before jumping back to us.
-      c->proc = p;
-      switchuvm(p);
-      p->state = RUNNING;
+        // Switch to chosen process.  It is the process's job
+        // to release ptable.lock and then reacquire it
+        // before jumping back to us.
+        c->proc = p;
+        switchuvm(p);
+        p->state = RUNNING;
 
-      swtch(&(c->scheduler), p->context);
-      switchkvm();
+        swtch(&(c->scheduler), p->context);
+        switchkvm();
 
-      // Process time quantom is up, update accumulator
-      if(p->state == RUNNABLE)
-        p->accumulator = p->accumulator + p->ps_priority;
+        // Process time quantom is up, update accumulator
+        if(p->state == RUNNABLE)
+          p->accumulator = p->accumulator + p->ps_priority;
 
-      // Process is done running for now.
-      // It should have changed its p->state before coming back.
-      c->proc = 0;
+        // Process is done running for now.
+        // It should have changed its p->state before coming back.
+        c->proc = 0;
+        // If scheduling policy changed
+        if(sched_type != 0)
+          break;
+      }
     }
+    // Priority Scheduling policy
+    
+    if(sched_type == 1){
+      // Choose one process
+      for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+        if(p->state == RUNNABLE){
+          p2 = p;
+        }
+      }
+      // If the is no runnable process - loop again
+      if(p2 == null){
+        release(&ptable.lock);
+        continue;
+      }
+
+      // Now choose the process with the minimal accumulator
+      for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+        if((p->state == RUNNABLE) && (p->accumulator < p2->accumulator)){
+            p2 = p;
+        }
+      }
+          
+
+        // Switch to chosen process.  It is the process's job
+        // to release ptable.lock and then reacquire it
+        // before jumping back to us.
+        p = p2;
+        c->proc = p;
+        switchuvm(p);
+        p->state = RUNNING;
+
+        swtch(&(c->scheduler), p->context);
+        switchkvm();
+
+        // Process time quantom is up, update accumulator
+        if(p->state == RUNNABLE)
+          p->accumulator = p->accumulator + p->ps_priority;
+
+        // Process is done running for now.
+        // It should have changed its p->state before coming back.
+        c->proc = 0;
+      
+    }
+    
+    // Completely Fair Scheduling policy with decay factor
+    
+    if(sched_type == 2){
+    // Choose one process
+      for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+        if(p->state == RUNNABLE){
+          p2 = p;
+        }
+      }
+      // If the is no runnable process - loop again
+      if(p2 == null){
+        release(&ptable.lock);
+        continue;
+      }
+
+      // @TODO: check that the calculation is right
+      // Now choose the process with the minimal run time ratio
+      for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+        if((p->state == RUNNABLE) && (((p->rtime*p->decay_factor)/
+          (p->rtime + p->retime + p->stime)) < ((p2->rtime*p2->decay_factor)/
+          (p2->rtime + p2->retime + p2->stime)))){
+            p2 = p;
+        }
+      }
+
+        // Switch to chosen process.  It is the process's job
+        // to release ptable.lock and then reacquire it
+        // before jumping back to us.
+        p = p2;
+        c->proc = p;
+        switchuvm(p);
+        p->state = RUNNING;
+
+        swtch(&(c->scheduler), p->context);
+        switchkvm();
+
+        // Process time quantom is up, update accumulator
+        if(p->state == RUNNABLE)
+          p->accumulator = p->accumulator + p->ps_priority;
+
+        // Process is done running for now.
+        // It should have changed its p->state before coming back.
+        c->proc = 0;
+    }
+    
     release(&ptable.lock);
 
   }
