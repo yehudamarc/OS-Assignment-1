@@ -52,6 +52,10 @@ struct proc {
   int status;                  // status of exit and wait
   int ps_priority;             // Process priority in Priority Scheduling policy (limited 1-10)
   long long accumulator;       // Accumulator field for Priority Scheduling policy
+  float decay_factor;         // CFS priority factor
+  int rtime;                   // Time process was in running state
+  int stime;                   // Time process was in sleeping state
+  int retime;                  // Time process was in ready/runnable state
 };
 
 // Process memory is laid out contiguously, low addresses first:
@@ -59,3 +63,4 @@ struct proc {
 //   original data and bss
 //   fixed-size stack
 //   expandable heap
+
