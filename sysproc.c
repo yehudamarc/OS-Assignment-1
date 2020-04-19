@@ -131,3 +131,12 @@ sys_proc_info(void)
 
 }
 
+int
+sys_set_cfs_priority(void)
+{
+  int prio;
+
+  if(argint(0, &prio) < 0)
+    return -1;
+  return set_cfs_priority(prio);
+}

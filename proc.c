@@ -89,9 +89,14 @@ allocproc(void)
 found:
   p->state = EMBRYO;
   p->pid = nextpid++;
-  //initilize ps_priority to 5
+  //initilize ps_priority to process fields
   p->ps_priority = 5;
   resetAccumultor(p);
+  p->decay_factor = 1;
+  p->rtime = 0;
+  p->stime = 0;
+  p->retime = 0;
+
 
   release(&ptable.lock);
 
@@ -203,6 +208,8 @@ fork(void)
   np->sz = curproc->sz;
   np->parent = curproc;
   *np->tf = *curproc->tf;
+  //set cfs priority of child as father
+  np->decay_factor = curproc->decay_factor;
 
   // Clear %eax so that fork returns 0 in the child.
   np->tf->eax = 0;
@@ -579,6 +586,27 @@ set_ps_priority(int priority)
   
 }
 
+// Set the decay factor for cfs priority policy
+int
+set_cfs_priority(int priority)
+{
+  if(priority == 1){ // High priority
+    myproc()->decay_factor = 0.75;
+    return 0;
+  }
+  else if(priority == 2){ // Normal priority
+    myproc()->decay_factor = 1;
+    return 0;
+  }
+  else if(priority == 3){ // Low priority
+    myproc()->decay_factor = 1.25;
+    return 0;
+  }
+  return -1; 
+  
+}
+
+
 //
 //
 static void
@@ -614,6 +642,10 @@ proc_info(struct perf * performance)
   performance->pid = myproc()->pid;
   performance->ps_priority = myproc()->ps_priority;
   performance->accumulator = myproc()->accumulator;
+  performance->cfs_priority = myproc()->decay_factor;
+  performance->rtime = myproc()->rtime;
+  performance->stime = myproc()->stime;
+  performance->retime = myproc()->retime;
 
   return 0;
 }

@@ -11,5 +11,8 @@ struct perf {
 int ps_priority;
 int accumulator;
 int pid;
+float cfs_priority;
 int rtime;
+int stime;
+int retime;
 };

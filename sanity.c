@@ -5,7 +5,40 @@
 int
 main(int argc, char *argv[])
 {
-	
+
+	// --------- Test for set cfs priority, with dacay factor as int -----
+/*
+	struct perf* performance;
+	performance = malloc(sizeof(struct perf));
+
+	if(proc_info(performance) < 0)
+		printf(1, "%s", "Error!\n");
+
+	printf(1, "%s%d%s", "The process 1 id is: ", performance->pid, "\n");
+	printf(1, "%s%d%s", "The process 1 priority is: ", performance->ps_priority, "\n");
+	printf(1, "%s%d%s", "The process 1 accumulator is: ", performance->accumulator, "\n");
+	printf(1, "%s%d%s", "The process 1 cfs priority is: ", performance->cfs_priority, "\n");
+	printf(1, "%s%d%s", "The process 1 rtime is: ", performance->rtime, "\n");
+	printf(1, "%s%d%s", "The process 1 stime is: ", performance->stime, "\n");
+	printf(1, "%s%d%s", "The process 1 retime is: ", performance->retime, "\n");
+
+	if(set_cfs_priority(1) < 0 || proc_info(performance) < 0)
+		printf(1, "%s", "Error!\n");
+	printf(1, "%s%d%s", "The process 1 cfs priority is: ", performance->cfs_priority, "\n");
+	if(set_cfs_priority(2) < 0 || proc_info(performance) < 0)
+		printf(1, "%s", "Error!\n");
+	printf(1, "%s%d%s", "The process 1 cfs priority is: ", performance->cfs_priority, "\n");
+	if(set_cfs_priority(3) < 0 || proc_info(performance) < 0)
+		printf(1, "%s", "Error!\n");
+	printf(1, "%s%d%s", "The process 1 cfs priority is: ", performance->cfs_priority, "\n");
+	if(set_cfs_priority(4) < 0 || proc_info(performance) < 0)
+		printf(1, "%s", "Error!\n");
+	printf(1, "%s%d%s", "The process 1 cfs priority is: ", performance->cfs_priority, "\n");
+*/
+
+
+/*
+	//----------  Accumulator test (by proc info) -------------
 
 	struct perf* performance4;
 	performance4 = malloc(sizeof(struct perf));
@@ -112,6 +145,8 @@ main(int argc, char *argv[])
 
 
  	printf(1, "%s", "All the processes finished running!\n");
+
+*/
 
 	exit(0);
 }
