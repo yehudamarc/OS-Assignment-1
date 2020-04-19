@@ -122,6 +122,7 @@ void            wakeup(void*);
 void            yield(void);
 int 			policy(int);
 int 			set_ps_priority(int);
+int 			proc_info(struct perf * perf);
 
 // swtch.S
 void            swtch(struct context**, struct context*);

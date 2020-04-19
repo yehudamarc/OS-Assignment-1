@@ -19,6 +19,7 @@ extern void forkret(void);
 extern void trapret(void);
 
 static void wakeup1(void *chan);
+static void resetAccumultor(struct proc *curr_proc);
 
 void
 pinit(void)
@@ -90,6 +91,7 @@ found:
   p->pid = nextpid++;
   //initilize ps_priority to 5
   p->ps_priority = 5;
+  resetAccumultor(p);
 
   release(&ptable.lock);
 
@@ -358,6 +360,10 @@ scheduler(void)
       swtch(&(c->scheduler), p->context);
       switchkvm();
 
+      // Process time quantom is up, update accumulator
+      if(p->state == RUNNABLE)
+        p->accumulator = p->accumulator + p->ps_priority;
+
       // Process is done running for now.
       // It should have changed its p->state before coming back.
       c->proc = 0;
@@ -472,8 +478,11 @@ wakeup1(void *chan)
   struct proc *p;
 
   for(p = ptable.proc; p < &ptable.proc[NPROC]; p++)
-    if(p->state == SLEEPING && p->chan == chan)
+    if(p->state == SLEEPING && p->chan == chan){
       p->state = RUNNABLE;
+      //@TODO: check if it is the right place to reset the accumulator
+      resetAccumultor(p);
+    }
 }
 
 // Wake up all processes sleeping on chan.
@@ -569,3 +578,46 @@ set_ps_priority(int priority)
   return -1; 
   
 }
+
+//
+//
+static void
+resetAccumultor(struct proc *curr_proc)
+{
+  struct proc *p;
+  int accumulator = 0;
+
+for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+    if(p->pid !=curr_proc->pid && (p->state == RUNNABLE || p->state == RUNNING)){
+      accumulator = p->accumulator;
+      break;
+    }
+  }
+
+  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+    if(p->pid !=curr_proc->pid && (p->state == RUNNABLE || p->state == RUNNING))
+      if(p->accumulator < accumulator)
+        accumulator = p->accumulator;
+  }
+
+  curr_proc->accumulator = accumulator;
+
+}
+
+// Gather current process statistics into given structure
+int 
+proc_info(struct perf * performance)
+{
+  if(performance == null)
+    return -1;
+
+  performance->pid = myproc()->pid;
+  performance->ps_priority = myproc()->ps_priority;
+  performance->accumulator = myproc()->accumulator;
+
+  return 0;
+}
+
+
+
+
