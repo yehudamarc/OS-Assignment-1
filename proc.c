@@ -665,10 +665,10 @@ updateStats(void)
       p->rtime++;
     }
     if(p->state == RUNNABLE){
-      p->stime++;
+      p->retime++;
     }
     if(p->state == SLEEPING){
-      p->retime++;
+      p->stime++;
     }
   }
 

@@ -7,7 +7,7 @@ main(int argc, char *argv[])
 {
 
 	//--------------- Test for statistics update in clock ticks --------
-	/*
+/*	
 	struct perf* performance4;
 	performance4 = malloc(sizeof(struct perf));
 
@@ -175,8 +175,8 @@ main(int argc, char *argv[])
 
 
  	printf(1, "%s", "All the processes finished running!\n");
-
 */
+
 
 
 	// --------- Test for set cfs priority, with dacay factor as int -----
