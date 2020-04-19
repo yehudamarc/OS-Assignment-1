@@ -14,7 +14,7 @@ main(int argc, char *argv[])
 	if(fork() == 0)
 	{
 		struct perf* performance1;
-	performance1 = malloc(sizeof(struct perf));
+		performance1 = malloc(sizeof(struct perf));
 		set_ps_priority(1);
 
 		int i = 1000000;
@@ -23,18 +23,22 @@ main(int argc, char *argv[])
 		while(i--)
 			dummy+=i;
 
-		if(proc_info(performance1) == 9)
+		if(proc_info(performance1) < 0)
 			printf(1, "%s", "Error!!!\n");
 
+		printf(1, "%s%d%s", "The process 1 id is: ", performance1->pid, "\n");
 		printf(1, "%s%d%s", "The process 1 priority is: ", performance1->ps_priority, "\n");
-		printf(1, "%s%d%s", "The process 1 accumulator is: ", performance1->rtime, "\n");
+		printf(1, "%s%d%s", "The process 1 accumulator is: ", performance1->accumulator, "\n");
 
 		exit(0);
 	}
 	else{
 		wait(null);
+		if(proc_info(performance4) < 0)
+			printf(1, "%s", "Error in proc_info for ABALE\n");
+		printf(1, "%s%d%s", "The ABALE id is: ", performance4->pid, "\n");
 		printf(1, "%s%d%s", "The ABALE priority is: ", performance4->ps_priority, "\n");
-		printf(1, "%s%d%s", "The ABALE accumulator is: ", performance4->rtime, "\n");
+		printf(1, "%s%d%s", "The ABALE accumulator is: ", performance4->accumulator, "\n");
 		}
 
 
@@ -53,15 +57,19 @@ main(int argc, char *argv[])
 
 		proc_info(performance2);
 
+		printf(1, "%s%d%s", "The process 2 id is: ", performance2->pid, "\n");
 		printf(1, "%s%d%s", "The process 2 priority is: ", performance2->ps_priority, "\n");
-		printf(1, "%s%d%s", "The process 2 accumulator is: ", performance2->rtime, "\n");
+		printf(1, "%s%d%s", "The process 2 accumulator is: ", performance2->accumulator, "\n");
 
 		exit(0);
 	}
 	else{
 		wait(null);
+		if(proc_info(performance4) < 0)
+			printf(1, "%s", "Error in proc_info for ABALE\n");
+		printf(1, "%s%d%s", "The ABALE id is: ", performance4->pid, "\n");
 		printf(1, "%s%d%s", "The ABALE priority is: ", performance4->ps_priority, "\n");
-		printf(1, "%s%d%s", "The ABALE accumulator is: ", performance4->rtime, "\n");
+		printf(1, "%s%d%s", "The ABALE accumulator is: ", performance4->accumulator, "\n");
 		}
 
 
@@ -85,17 +93,20 @@ main(int argc, char *argv[])
 
 		proc_info(performance3);
 
-
+		printf(1, "%s%d%s", "The process 3 id is: ", performance3->pid, "\n");
 		printf(1, "%s%d%s", "The process 3 priority is: ", performance3->ps_priority, "\n");
-		printf(1, "%s%d%s", "The process 3 accumulator is: ", performance3->rtime, "\n");
+		printf(1, "%s%d%s", "The process 3 accumulator is: ", performance3->accumulator, "\n");
 
 		exit(0);
 	}
 
 	else{
 		wait(null);
+		if(proc_info(performance4) < 0)
+			printf(1, "%s", "Error in proc_info for ABALE\n");
+		printf(1, "%s%d%s", "The ABALE id is: ", performance4->pid, "\n");
 		printf(1, "%s%d%s", "The ABALE priority is: ", performance4->ps_priority, "\n");
-		printf(1, "%s%d%s", "The ABALE accumulator is: ", performance4->rtime, "\n");
+		printf(1, "%s%d%s", "The ABALE accumulator is: ", performance4->accumulator, "\n");
 		}
 
 

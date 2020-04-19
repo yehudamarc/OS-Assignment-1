@@ -480,6 +480,7 @@ wakeup1(void *chan)
   for(p = ptable.proc; p < &ptable.proc[NPROC]; p++)
     if(p->state == SLEEPING && p->chan == chan){
       p->state = RUNNABLE;
+      //@TODO: check if it is the right place to reset the accumulator
       resetAccumultor(p);
     }
 }
@@ -610,8 +611,9 @@ proc_info(struct perf * performance)
   if(performance == null)
     return -1;
 
+  performance->pid = myproc()->pid;
   performance->ps_priority = myproc()->ps_priority;
-  performance->rtime = myproc()->accumulator;
+  performance->accumulator = myproc()->accumulator;
 
   return 0;
 }
