@@ -90,14 +90,14 @@ sys_uptime(void)
   return xticks;
 }
 
-//return the memory size of the current process
+// Return the memory size of the current process
 int
 sys_memsize(void)
 {
   return myproc()->sz;
 }
 
-//@TODO: check what value to send
+// Calling policy system call
 int
 sys_policy(void)
 {
@@ -127,7 +127,6 @@ sys_proc_info(void)
   if(argptr(0, ((void*)&perf),sizeof(*perf)) < 0)
       return -1;
   return proc_info(perf);
-  //@TODO: how to put information into perf struct?
 
 }
 

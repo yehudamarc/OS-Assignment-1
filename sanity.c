@@ -18,22 +18,27 @@ main(int argc, char *argv[])
 
 	if(fork() == 0)
 	{
+		// Initilize struct for process information
 		struct perf* performance1;
 		performance1 = malloc(sizeof(struct perf));
+		// Setting priorities to high priority
 		set_ps_priority(1);
 		set_cfs_priority(1);
 
 		int i = 1000000;
 		int dummy = 0;
 
+		// Work...
 		while(i--){
 			fib(4);
 			dummy+=i;
 		}
 
+		// Gather info
 		if(proc_info(performance1) < 0)
 			printf(1, "%s", "Error!!!\n");
 
+		// Print info
 		printf(1, "%d\t%d\t\t%d\t%d\t%d\n", getpid(), performance1->ps_priority, performance1->stime, performance1->retime, performance1->rtime);
 
 		exit(0);
@@ -41,14 +46,17 @@ main(int argc, char *argv[])
 	
 	if(fork() == 0)
 	{
+		// Initilize struct for process information
 		struct perf* performance2;
 		performance2 = malloc(sizeof(struct perf));
+		// Setting priorities to Medium priority
 		set_ps_priority(5);
 		set_cfs_priority(2);
 
 		int i = 1000000;
 		int dummy = 0;
 
+		// Work...
 		while(i--){
 			fib(4);
 			dummy+=i;
@@ -65,15 +73,17 @@ main(int argc, char *argv[])
 
 	if(fork() == 0)
 	{
-
+		// Initilize struct for process information
 		struct perf* performance3;
 		performance3 = malloc(sizeof(struct perf));
+		// Setting priorities to Low priority
 		set_ps_priority(10);
 		set_cfs_priority(3);
 
 		int i = 1000000;
 		int dummy = 0;
 
+		// Work...
 		while(i--){
 			fib(4);
 			dummy+=i;
@@ -87,7 +97,7 @@ main(int argc, char *argv[])
 		exit(0);
 	}
 
-
+	// wait for all 3 children
 	wait(null);
 	wait(null);
 	wait(null);

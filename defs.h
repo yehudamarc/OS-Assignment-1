@@ -196,5 +196,5 @@ void            clearpteu(pde_t *pgdir, char *uva);
 
 // global variables
 
-int sched_type; 	//represnt the current scheduler policy
+int sched_type; 	// Represnt the current scheduler policy
 					// 0 - Default, 1 - PS, 2 - CFS

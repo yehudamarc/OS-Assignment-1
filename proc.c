@@ -89,9 +89,11 @@ allocproc(void)
 found:
   p->state = EMBRYO;
   p->pid = nextpid++;
-  //initilize ps_priority to process fields
+  // Initilize ps_priority to process field
   p->ps_priority = 5;
+  // Initilize accumulator field
   resetAccumultor(p);
+  // Inilizing rest of the fields
   p->decay_factor = 1;
   p->rtime = 0;
   p->stime = 0;
@@ -208,7 +210,7 @@ fork(void)
   np->sz = curproc->sz;
   np->parent = curproc;
   *np->tf = *curproc->tf;
-  //set cfs priority of child as father
+  // Set cfs priority of child as father
   np->decay_factor = curproc->decay_factor;
 
   // Clear %eax so that fork returns 0 in the child.
@@ -245,7 +247,7 @@ exit(int status)
   if(curproc == initproc)
     panic("init exiting");
 
-  //update exit status
+  // Update exit status
   curproc->status = status;
 
   // Close all open files.
@@ -302,7 +304,7 @@ wait(int* status)
         // Found one.
         pid = p->pid;
         if(status != null)
-          *status = p->status; //update exit status of terminated child
+          *status = p->status; // Update exit status of terminated child
         kfree(p->kstack);
         p->kstack = 0;
         freevm(p->pgdir);
@@ -310,7 +312,7 @@ wait(int* status)
         p->parent = 0;
         p->name[0] = 0;
         p->killed = 0;
-        p->status = 0;    //reset status of terminated process (child)
+        p->status = 0;    // Reset status of terminated process (child)
         p->state = UNUSED;
         release(&ptable.lock);
         return pid;
@@ -340,25 +342,22 @@ void
 scheduler(void)
 {
   struct proc *p;
-  struct proc *p2;
+  struct proc *min_p;
   struct cpu *c = mycpu();
   c->proc = 0;
-
-  //@TODO check if it is the right place to initialize
-  //initializing scheduler policy to default
-  sched_type = 0;
   
   for(;;){
     // Enable interrupts on this processor.
     sti();
 
-    //reset temporary variable p2
-    p2 = null;
+    // Reset temporary variable min_p
+    min_p = null;
 
-    // Loop over process table looking for process to run.
+    
     acquire(&ptable.lock);
     // Default Scheduling policy
     if(sched_type == 0){
+      // Loop over process table looking for process to run.
       for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
         if(p->state != RUNNABLE)
           continue;
@@ -380,30 +379,31 @@ scheduler(void)
         // Process is done running for now.
         // It should have changed its p->state before coming back.
         c->proc = 0;
-        // If scheduling policy changed
+
+        // Check if scheduling policy changed
         if(sched_type != 0)
           break;
       }
     }
-    // Priority Scheduling policy
-    
+
+    // Priority Scheduling policy   
     if(sched_type == 1){
       // Choose one process
       for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
         if(p->state == RUNNABLE){
-          p2 = p;
+          min_p = p;
         }
       }
       // If the is no runnable process - loop again
-      if(p2 == null){
+      if(min_p == null){
         release(&ptable.lock);
         continue;
       }
 
-      // Now choose the process with the minimal accumulator
+      // Now choose the process with the minimal accumulator value
       for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
-        if((p->state == RUNNABLE) && (p->accumulator < p2->accumulator)){
-            p2 = p;
+        if((p->state == RUNNABLE) && (p->accumulator < min_p->accumulator)){
+            min_p = p;
         }
       }
           
@@ -411,7 +411,7 @@ scheduler(void)
         // Switch to chosen process.  It is the process's job
         // to release ptable.lock and then reacquire it
         // before jumping back to us.
-        p = p2;
+        p = min_p;
         c->proc = p;
         switchuvm(p);
         p->state = RUNNING;
@@ -430,34 +430,32 @@ scheduler(void)
     }
     
     // Completely Fair Scheduling policy with decay factor
-    
     if(sched_type == 2){
     // Choose one process
       for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
         if(p->state == RUNNABLE){
-          p2 = p;
+          min_p = p;
         }
       }
       // If the is no runnable process - loop again
-      if(p2 == null){
+      if(min_p == null){
         release(&ptable.lock);
         continue;
       }
 
-      // @TODO: check that the calculation is right
       // Now choose the process with the minimal run time ratio
       for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
         if((p->state == RUNNABLE) && (((p->rtime*p->decay_factor)/
-          (p->rtime + p->retime + p->stime)) < ((p2->rtime*p2->decay_factor)/
-          (p2->rtime + p2->retime + p2->stime)))){
-            p2 = p;
+          (p->rtime + p->retime + p->stime)) < ((min_p->rtime*min_p->decay_factor)/
+          (min_p->rtime + min_p->retime + min_p->stime)))){
+            min_p = p;
         }
       }
 
         // Switch to chosen process.  It is the process's job
         // to release ptable.lock and then reacquire it
         // before jumping back to us.
-        p = p2;
+        p = min_p;
         c->proc = p;
         switchuvm(p);
         p->state = RUNNING;
@@ -586,7 +584,7 @@ wakeup1(void *chan)
   for(p = ptable.proc; p < &ptable.proc[NPROC]; p++)
     if(p->state == SLEEPING && p->chan == chan){
       p->state = RUNNABLE;
-      //@TODO: check if it is the right place to reset the accumulator
+      // Reset the accumulator field
       resetAccumultor(p);
     }
 }
@@ -660,6 +658,7 @@ procdump(void)
   }
 }
 
+// Change scheduler policy
 int
 policy(int pol) 
   {
@@ -669,11 +668,11 @@ policy(int pol)
     return 0;
   }
 
-  //if illegal value
+  // if illegal value
   return -1;
 }
 
-//set the priority is ps policy
+// Set the priority in ps policy
 int
 set_ps_priority(int priority)
 {
@@ -706,16 +705,17 @@ set_cfs_priority(int priority)
 }
 
 
-//
-//
+//  Reset the accumulator field for process that waked up or created
+//  Set the value to be the current minimum or 0 if it is the only
+//  process runnable/running
 static void
 resetAccumultor(struct proc *curr_proc)
 {
   struct proc *p;
   int accumulator = 0;
 
-  //@TODO: check if and how to acquire lock
-  // acquire(&ptable.lock);
+  // Save the accumulator value of some active process
+  // remain 0 if there isn't one.
   for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
     if(p->pid !=curr_proc->pid && (p->state == RUNNABLE || p->state == RUNNING)){
       accumulator = p->accumulator;
@@ -723,12 +723,12 @@ resetAccumultor(struct proc *curr_proc)
     }
   }
 
+  // Set the process accumulator to the minimal value (or 0)
   for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
     if(p->pid !=curr_proc->pid && (p->state == RUNNABLE || p->state == RUNNING))
       if(p->accumulator < accumulator)
         accumulator = p->accumulator;
   }
-  // release(&ptable.lock);
 
   curr_proc->accumulator = accumulator;
 
@@ -749,6 +749,8 @@ proc_info(struct perf * performance)
   return 0;
 }
 
+// After a clock tick occurs it raise the value of the relevant field
+// of every process
 void
 updateStats(void)
 {

@@ -49,13 +49,13 @@ struct proc {
   struct file *ofile[NOFILE];  // Open files
   struct inode *cwd;           // Current directory
   char name[16];               // Process name (debugging)
-  int status;                  // status of exit and wait
+  int status;                  // Status of exit
   int ps_priority;             // Process priority in Priority Scheduling policy (limited 1-10)
   long long accumulator;       // Accumulator field for Priority Scheduling policy
-  float decay_factor;         // CFS priority factor
+  float decay_factor;          // CFS priority factor
   int rtime;                   // Time process was in running state
   int stime;                   // Time process was in sleeping state
-  int retime;                  // Time process was in ready/runnable state
+  int retime;                  // Time process was in runnable state
 };
 
 // Process memory is laid out contiguously, low addresses first:
