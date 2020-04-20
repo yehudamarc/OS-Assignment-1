@@ -2,6 +2,12 @@
 #include "stat.h"
 #include "user.h"
 
+int fib(int n) 
+{ 
+    if (n <= 1) 
+        return n; 
+    return fib(n-1) + fib(n-2); 
+} 
 
 int
 main(int argc, char *argv[])
@@ -15,12 +21,15 @@ main(int argc, char *argv[])
 		struct perf* performance1;
 		performance1 = malloc(sizeof(struct perf));
 		set_ps_priority(1);
+		set_cfs_priority(1);
 
 		int i = 1000000;
 		int dummy = 0;
 
-		while(i--)
+		while(i--){
+			fib(4);
 			dummy+=i;
+		}
 
 		if(proc_info(performance1) < 0)
 			printf(1, "%s", "Error!!!\n");
@@ -30,19 +39,20 @@ main(int argc, char *argv[])
 		exit(0);
 	}
 	
-	// wait(null);
-
 	if(fork() == 0)
 	{
 		struct perf* performance2;
 		performance2 = malloc(sizeof(struct perf));
 		set_ps_priority(5);
+		set_cfs_priority(2);
 
 		int i = 1000000;
 		int dummy = 0;
 
-		while(i--)
+		while(i--){
+			fib(4);
 			dummy+=i;
+		}
 
 		if(proc_info(performance2) < 0)
 			printf(1, "%s", "Error!!!\n");
@@ -52,7 +62,6 @@ main(int argc, char *argv[])
 		exit(0);
 	}
 
-	// wait(null);
 
 	if(fork() == 0)
 	{
@@ -60,12 +69,15 @@ main(int argc, char *argv[])
 		struct perf* performance3;
 		performance3 = malloc(sizeof(struct perf));
 		set_ps_priority(10);
+		set_cfs_priority(3);
 
 		int i = 1000000;
 		int dummy = 0;
 
-		while(i--)
+		while(i--){
+			fib(4);
 			dummy+=i;
+		}
 
 		if(proc_info(performance3) < 0)
 			printf(1, "%s", "Error!!!\n");
